@@ -263,8 +263,16 @@
     // Set reference image
     el.referenceImage.src = previewDataUrl || imageUrl;
 
-    // Notify all players
-    socket.emit('start-puzzle', { pieces });
+    // Strip imageData before sending - each client renders pieces locally
+    // This reduces payload from several MB to just a few KB
+    const piecesForSync = pieces.map(p => ({
+      id: p.id, row: p.row, col: p.col,
+      tabs: p.tabs,
+      currentX: p.currentX, currentY: p.currentY,
+      targetX: p.targetX, targetY: p.targetY,
+      placed: p.placed
+    }));
+    socket.emit('start-puzzle', { pieces: piecesForSync });
     updateProgress();
   }
 
