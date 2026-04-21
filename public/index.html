@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="description" content="실시간 협동 직소 퍼즐 - 이미지를 올리고 함께 맞추세요!">
+  <title>🧩 Puzzle Together - 함께 맞추는 퍼즐</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- ====== LOBBY SCREEN ====== -->
+  <div id="screen-lobby" class="screen active">
+    <div class="lobby">
+      <div class="logo">🧩</div>
+      <h1>Puzzle Together</h1>
+      <p class="subtitle">이미지를 올리고 함께 퍼즐을 맞추세요!</p>
+      <div class="lobby-actions">
+        <button class="btn btn-primary" id="btn-create">
+          ✨ 방 만들기
+        </button>
+        <button class="btn btn-secondary" id="btn-join">
+          🚀 방 참가하기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== CREATE ROOM SCREEN ====== -->
+  <div id="screen-create" class="screen">
+    <div class="card">
+      <h2>✨ 새 퍼즐방 만들기</h2>
+
+      <div class="form-group">
+        <label>닉네임</label>
+        <input type="text" id="create-name" placeholder="선생님 이름을 입력하세요" maxlength="20">
+      </div>
+
+      <div class="form-group">
+        <label>퍼즐 이미지</label>
+        <div class="upload-area" id="upload-area">
+          <div class="upload-icon">📁</div>
+          <div class="upload-text"><strong>클릭</strong> 또는 이미지를 <strong>드래그</strong>하세요</div>
+        </div>
+        <input type="file" id="image-upload" accept="image/*">
+      </div>
+
+      <div class="form-group">
+        <label>퍼즐 난이도</label>
+        <select id="grid-size">
+          <option value="3">쉬움 (3×3 = 9조각)</option>
+          <option value="4" selected>보통 (4×4 = 16조각)</option>
+          <option value="5">어려움 (5×5 = 25조각)</option>
+          <option value="6">매우 어려움 (6×6 = 36조각)</option>
+          <option value="7">도전 (7×7 = 49조각)</option>
+          <option value="8">고수 (8×8 = 64조각)</option>
+          <option value="9">전문가 (9×9 = 81조각)</option>
+          <option value="10">최고 난이도 (10×10 = 100조각)</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-secondary" id="btn-back-create">← 뒤로</button>
+        <button class="btn btn-primary" id="btn-create-room" disabled>방 만들기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== JOIN ROOM SCREEN ====== -->
+  <div id="screen-join" class="screen">
+    <div class="card">
+      <h2>🚀 방 참가하기</h2>
+
+      <div class="form-group">
+        <label>닉네임</label>
+        <input type="text" id="join-name" placeholder="이름을 입력하세요" maxlength="20">
+      </div>
+
+      <div class="form-group">
+        <label>방 코드</label>
+        <input type="text" id="join-code" placeholder="6자리 방 코드" maxlength="6" style="text-transform: uppercase; letter-spacing: 4px; font-size: 1.3rem; text-align: center; font-weight: 700;">
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-secondary" id="btn-back-join">← 뒤로</button>
+        <button class="btn btn-primary" id="btn-join-room">참가하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== PUZZLE SCREEN ====== -->
+  <div id="screen-puzzle" class="screen puzzle-screen">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h3>🧩 Puzzle Together</h3>
+      </div>
+
+      <div class="room-code-display" id="room-code-display" title="클릭하여 복사">
+        <div>
+          <div class="label">방 코드</div>
+          <div class="code" id="display-room-code">------</div>
+        </div>
+        <span class="copy-icon">📋</span>
+      </div>
+
+      <div class="players-section">
+        <h4>참가자</h4>
+        <ul class="player-list" id="player-list"></ul>
+      </div>
+
+      <div class="progress-section">
+        <h4>진행률</h4>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="progress-text" id="progress-text">0 / 0 조각</div>
+      </div>
+
+      <div class="sidebar-actions">
+        <button class="btn btn-small btn-secondary" id="btn-toggle-ref">🖼️ 원본 보기</button>
+        <button class="btn btn-small btn-danger" id="btn-leave">🚪 나가기</button>
+      </div>
+    </div>
+
+    <!-- Puzzle Area -->
+    <div class="puzzle-container" id="puzzle-container">
+      <div class="puzzle-board" id="puzzle-board"></div>
+      <img class="reference-image" id="reference-image" style="display: none;" alt="원본 이미지">
+    </div>
+  </div>
+
+  <!-- ====== COMPLETION OVERLAY ====== -->
+  <div class="completion-overlay" id="completion-overlay" style="display: none;">
+    <div class="trophy">🏆</div>
+    <h1>퍼즐 완성!</h1>
+    <p>모두 함께 완성했습니다! 🎉</p>
+    <button class="btn btn-primary" id="btn-new-game">🔄 새 게임</button>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/puzzle.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
